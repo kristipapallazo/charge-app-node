@@ -1,21 +1,45 @@
 import { Router, Request, Response, NextFunction } from "express";
-
-console.log("process.env", process.env);
+import axios from "axios";
 
 const MAPS_API_KEY = process.env.MAPS_API_KEY;
 console.log("MAPS_API_KEY", MAPS_API_KEY);
 
 const router = Router();
 
-// Define the route
-router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  if (MAPS_API_KEY) {
-    res.status(200).send(MAPS_API_KEY); // Send the API key if it exists
-    return;
-  } else {
-    res.status(500).send("error occurred"); // Send an error if the API key is missing
-  }
-});
+router.get(
+  "/api/geocode",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const address: string | undefined = req.query?.address as
+      | string
+      | undefined;
 
-// Export the router to be used in your main app
+    try {
+      if (!address || MAPS_API_KEY)
+        throw new Error(
+          "Error occured: Address or API key is missing => " + address
+        );
+
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          address
+        )}&key=${MAPS_API_KEY}`
+      );
+
+      res.status(200).json({ data: response.data });
+
+      // const { results, status } = response.data;
+
+      // if (status === 'OK') {
+      //   const coordinates = results[0].geometry.location;
+      //   res.json({ coordinates }); // Correct: send response
+      // } else {
+      //   res.status(400).json({ error: status }); // Correct: send response
+      // }
+    } catch (error) {
+      console.log("Error: " + error);
+      res.status(500).json({ error: true, message: "Geocodigng failed" });
+    }
+  }
+);
+
 export default router;

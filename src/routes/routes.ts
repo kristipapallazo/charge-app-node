@@ -1,10 +1,17 @@
 import { Router, Request, Response, NextFunction } from "express";
 import axios from "axios";
+import { sendEmailSetRoutes } from "./sendEmail";
 
 const MAPS_API_KEY = process.env.MAPS_API_KEY;
 console.log("MAPS_API_KEY", MAPS_API_KEY);
 
 const router = Router();
+
+router.use("/send-email", sendEmailSetRoutes);
+
+router.get("/", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Hello from the server!" });
+});
 
 router.get(
   "/api/geocode",

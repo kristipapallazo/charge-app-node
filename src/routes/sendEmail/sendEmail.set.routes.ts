@@ -7,10 +7,11 @@ const sendEmailRoutes = Router();
 sendEmailRoutes.post(
   "/",
   [
+    body("full-name").notEmpty().escape().withMessage("Full name is required"),
     body("email").isEmail().withMessage("Invalid email"),
     // body("email").isEmail().notEmpty().escape(),
-    body("subject").notEmpty().escape(),
-    body("message").notEmpty().escape(),
+    body("subject").escape(),
+    body("message").notEmpty().escape().withMessage("Message is required"),
   ],
   (req: Request, res: Response) => {
     try {
@@ -27,11 +28,11 @@ sendEmailRoutes.post(
 
       const { email, subject, message } = data;
 
-      const userData = {
-        email: "kristi.papallazo@gmail.com",
-        subject: "lts",
-        message: "opppps",
-      };
+      // const userData = {
+      //   email: "kristi.papallazo@gmail.com",
+      //   subject: "lts",
+      //   message: "opppps",
+      // };
       // const { email, subject, message } = userData;
 
       const processedSubject = `Email from ${email} - ${subject}`;
